@@ -1,6 +1,7 @@
 // models/todo.js
 "use strict";
-const { Model, Op } = require("sequelize");
+const { Op } = require("sequelize");
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
 	class Todo extends Model {
 		/**
@@ -13,23 +14,29 @@ module.exports = (sequelize, DataTypes) => {
 		}
 		static async showList() {
 			console.log("My Todo list \n");
-			//------------------------------------
+
 			console.log("Overdue");
-			const overdueItems = await Todo.overdue();
+			// FILL IN HERE
+			const overdueLists = await Todo.overdue();
 			console.log(
-				overdueItems.map((item) => item.displayableString()).join("\n")
+				overdueLists.map((data) => data.displayableString()).join("\n")
 			);
 			console.log("\n");
-			//------------------------------------
+
 			console.log("Due Today");
-			const dueItems = await Todo.dueToday();
-			console.log(dueItems.map((item) => item.displayableString()).join("\n"));
-			console.log("\n");
-			//------------------------------------
-			console.log("Due Later");
-			const dueLaterItems = await Todo.dueLater();
+			// FILL IN HERE
+
+			const dueTodayLists = await Todo.dueToday();
 			console.log(
-				dueLaterItems.map((item) => item.displayableString()).join("\n")
+				dueTodayLists.map((data) => data.displayableString()).join("\n")
+			);
+			console.log("\n");
+
+			console.log("Due Later");
+			// FILL IN HERE
+			const dueLaterLists = await Todo.dueLater();
+			console.log(
+				dueLaterLists.map((data) => data.displayableString()).join("\n")
 			);
 		}
 
@@ -39,10 +46,8 @@ module.exports = (sequelize, DataTypes) => {
 				where: {
 					dueDate: {
 						[Op.lt]: new Date(),
-						// completed: false,
 					},
 				},
-				order: [["id", "ASC"]],
 			});
 		}
 
@@ -72,22 +77,21 @@ module.exports = (sequelize, DataTypes) => {
 
 		static async markAsComplete(id) {
 			// FILL IN HERE TO MARK AN ITEM AS COMPLETE
-			return Todo.update(
+			return await Todo.update(
 				{ completed: true },
 				{
-					where: {
-						id,
-					},
+					where: { id: id },
 				}
 			);
 		}
 
 		displayableString() {
 			let checkbox = this.completed ? "[x]" : "[ ]";
-			// let checkboxT = this.completed ? "[x]" : "[ ]";
-			// let checkbox = checkboxT.trim();
-			let finalString = `${this.id}. ${checkbox} ${this.title} ${this.dueDate}`;
-			return finalString.trim();
+			let date =
+				this.dueDate === new Date().toLocaleDateString("en-CA")
+					? ""
+					: ` ${this.dueDate}`;
+			return `${this.id}. ${checkbox} ${this.title}${date}`;
 		}
 	}
 	Todo.init(
